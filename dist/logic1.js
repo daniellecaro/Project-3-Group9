@@ -108,6 +108,9 @@ d3.json("new_file.json").then(function(data) {
     var kidsTotal = 0;
     var seniorsTotal = 0;
     var adultsTotal = 0;
+    var lakids1Total = 0;
+    var laseniors1Total = 0;
+    var laadults1Total = 0;
     var households = 0;
     var noVehicle = 0;
     var vehicle = 0;
@@ -119,6 +122,9 @@ d3.json("new_file.json").then(function(data) {
       kidsTotal += feature.properties.TractKids;
       seniorsTotal += feature.properties.TractSeniors;
       adultsTotal += feature.properties.Pop2010 - feature.properties.TractKids - feature.properties.TractSeniors;
+      lakids1Total += feature.properties.lakids1;
+      laseniors1Total += feature.properties.laseniors1;
+      laadults1Total += feature.properties.lapop1 - feature.properties.lakids1 - feature.properties.laseniors1;
       households += feature.properties.OHU2010;
       vehicle += feature.properties.TractHUNV;
       noVehicle += feature.properties.OHU2010 - feature.properties.TractHUNV;
@@ -127,7 +133,15 @@ d3.json("new_file.json").then(function(data) {
       yAsian += feature.properties.TractAsian;
       yHispanic += feature.properties.TractHispanic;
     });
-    var ageData = [      { label: "Kids", value: kidsTotal },      { label: "Seniors", value: seniorsTotal },      { label: "Adults", value: adultsTotal },    ];
+    var kidsData = [      
+      { label: "Kids", value: kidsTotal },      
+      { label: "Low Access Kids", value: lakids1Total }];      
+    var adultsData = [  
+      { label: "Adults", value: adultsTotal },          
+      { label: "Low Access Adults", value: laadults1Total }   ];
+    var seniorsData = [  
+      { label: "Seniors", value: seniorsTotal },
+      { label: "Low Access Seniors", value: laseniors1Total } ];
     var vehicleData = [
       { label: "Vehicle Access", value: noVehicle },
       { label: "No Vehicle Access", value: vehicle }
@@ -138,35 +152,54 @@ d3.json("new_file.json").then(function(data) {
       {label: "Asian", value: yAsian},
       {label: "Hispanic", value: yHispanic}      
     ]
-    var labels = ageData.map(function(d) { return d.label; });
-    var values = ageData.map(function(d) { return d.value; });
-    var trace = {
-      type: 'pie',
-      labels: labels,
-      values: values,
-      marker: {
-        colors: ['#feedde', '#fff2cc', '#f7b977']
-      }
+
+    var tracekids = {
+    x: kidsData.map(function(d) { return d.label; }),
+    y: kidsData.map(function(d) { return d.value; }),
+    name: "Kids",
+    type: "bar",
+    marker:{
+      color: ['#feedde','#feedde']
+    },
+    width: .5,
     };
-    var layout = {
-      autosize: false,
-      width: 500,
-      height: 500,
-      margin: {
-        l: 50,
-        r: 50,
-        b: 100,
-        t: 100,
-        pad: 4
+
+    var traceadults = {
+    x: adultsData.map(function(d) { return d.label; }),
+    y: adultsData.map(function(d) { return d.value; }),
+    name: "Adults",
+    type: "bar",
+    marker:{
+      color: ['#fac77d','#fac77d']
+    },
+    width: .5,
+    };
+
+    var traceseniors = {
+      x: seniorsData.map(function(d) { return d.label; }),
+      y: seniorsData.map(function(d) { return d.value; }),
+      name: "Seniors",
+      type: "bar",
+      marker:{
+        color: ['#fdae61','#fdae61']
       },
-      plot_bgcolor: '#c7c7c7',
-      title: 'Age distribution in the population'
+      width: .5,
+      };
+
+    var layout = {
+      title: "Age Breakdown of County",
+      barmode: 'group',
+      bargap: .15,
+      bargroupgap: .15,
+      width: 600,
+      height: 400
     };
-    var chartData = [trace];
-    Plotly.newPlot('piechart', chartData, layout);
-  var labels1 = vehicleData.map(function(d) { return d.label; });
-  var values1 = vehicleData.map(function(d) { return d.value; });
-  var trace1 = {
+
+    Plotly.newPlot("barage", [tracekids, traceadults, traceseniors], layout);
+
+    var labels1 = vehicleData.map(function(d) { return d.label; });
+    var values1 = vehicleData.map(function(d) { return d.value; });
+    var trace1 = {
     type: 'pie',
     labels: labels1,
     values: values1,
@@ -174,7 +207,7 @@ d3.json("new_file.json").then(function(data) {
       colors: ['#f7b977', '#fff2cc']
     }
   };
-  var layout1 = {
+    var layout1 = {
     autosize: false,
     width: 500,
     height: 500,
@@ -198,7 +231,7 @@ d3.json("new_file.json").then(function(data) {
     y: demovalues,
     type:'bar',
     marker:{
-      color: ['#FFFFB2','#FECC5C','#FD8D3C','#E31A1C']
+      color: ['#fdd0a2','#ffebcc','#fdae61','#fac77d']
     },
     width: .5,
     };
@@ -206,7 +239,9 @@ d3.json("new_file.json").then(function(data) {
       title: "Demographic Breakdown of County",
       barmode: 'group',
       bargap: .15,
-      bargroupgap: .15
+      bargroupgap: .15,
+      width: 600,
+      height: 400
     }
   Plotly.newPlot('bar', [tracebar], demolayout)
 }});
